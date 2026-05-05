@@ -1,7 +1,9 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiConstants {
-  static String get baseUrl => dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000/api/v1';
+  static String get baseUrl =>
+      dotenv.env['API_BASE_URL'] ??
+      'https://ai-job-application-agent-backend.onrender.com/api/v1';
 
   // Auth
   static const String authRegister = '/auth/register';

@@ -15,7 +15,8 @@ class JobRemoteDataSourceImpl implements JobRemoteDataSource {
   JobRemoteDataSourceImpl({required this.dioClient});
 
   @override
-  Future<JobModel> createJob(String? title, String rawText, String? sourceUrl) async {
+  Future<JobModel> createJob(
+      String? title, String rawText, String? sourceUrl) async {
     final response = await dioClient.dio.post(
       ApiConstants.job,
       data: {
@@ -36,11 +37,11 @@ class JobRemoteDataSourceImpl implements JobRemoteDataSource {
 
   @override
   Future<String> scrapeJob(String url) async {
-    final response = await dioClient.dio.post(
+    final response = await dioClient.dio.get(
       ApiConstants.jobScrape,
-      data: {'url': url},
+      queryParameters: {'url': url},
     );
-    return response.data['extracted_text'] ?? response.data['text'] ?? response.data;
+    return response.data['job_description'];
   }
 
   @override

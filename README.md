@@ -26,8 +26,7 @@ AIAA is a cutting-edge mobile application built with **Flutter** that leverages 
 
 ---
 
-## 📸 UI Preview
-*(Add your screenshots here)*
+
 
 ---
 

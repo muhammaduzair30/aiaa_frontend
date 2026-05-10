@@ -13,6 +13,8 @@ JobApplicationModel _$JobApplicationModelFromJson(Map<String, dynamic> json) =>
       cvId: json['cv_id'] as String,
       jobId: json['job_id'] as String,
       analysisId: json['analysis_id'] as String?,
+      cvFilename: JobApplicationModel._readCvFilename(json, 'cv') as String?,
+      jobTitle: JobApplicationModel._readJobTitle(json, 'job') as String?,
       status: json['status'] as String,
       appliedDate: json['applied_date'] == null
           ? null
@@ -29,6 +31,8 @@ Map<String, dynamic> _$JobApplicationModelToJson(
       'cv_id': instance.cvId,
       'job_id': instance.jobId,
       'analysis_id': instance.analysisId,
+      'cv': instance.cvFilename,
+      'job': instance.jobTitle,
       'status': instance.status,
       'applied_date': instance.appliedDate?.toIso8601String(),
       'notes': instance.notes,

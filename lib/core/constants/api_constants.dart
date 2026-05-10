@@ -14,7 +14,7 @@ class ApiConstants {
   static const String cv = '/cv';
   static const String cvUpload = '/cv/upload';
   static String cvById(String id) => '/cv/$id';
-
+  static String cvDownload(String id) => '/cv/$id/download';
   // Job
   static const String job = '/job';
   static const String jobScrape = '/job/scrape';

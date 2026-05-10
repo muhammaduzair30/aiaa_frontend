@@ -8,6 +8,7 @@ abstract class CVRemoteDataSource {
   Future<CVModel> uploadCV(List<int> bytes, String fileName);
   Future<List<CVModel>> getCVs();
   Future<void> deleteCV(String id);
+  Future<String> getDownloadUrl(String cvId);
 }
 
 class CVRemoteDataSourceImpl implements CVRemoteDataSource {
@@ -42,5 +43,11 @@ class CVRemoteDataSourceImpl implements CVRemoteDataSource {
   @override
   Future<void> deleteCV(String id) async {
     await dioClient.dio.delete(ApiConstants.cvById(id));
+  }
+
+  @override
+  Future<String> getDownloadUrl(String cvId) async {
+    final response = await dioClient.dio.get(ApiConstants.cvDownload(cvId));
+    return response.data['download_url'];
   }
 }

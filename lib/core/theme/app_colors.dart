@@ -7,6 +7,15 @@ class AppColors {
   static const Color surface = Colors.white;
   static const Color error = Colors.red;
 
+  // Modern UI Colors
+  static const Color textPrimary = Color(0xFF111827); // Gray 900
+  static const Color textSecondary = Color(0xFF4B5563); // Gray 600
+  static const Color textHint = Color(0xFF9CA3AF); // Gray 400
+  static const Color inputFill = Color(0xFFF9FAFB); // Gray 50
+  static const Color inputBorder = Color(0xFFE5E7EB); // Gray 200
+  static const Color inputBorderFocused = Color(0xFF534AB7); // Match primary
+  static const Color cardShadow = Color(0x0C000000);
+
   // Status colors
   static const Color statusSaved = Colors.grey;
   static const Color statusApplied = Colors.blue;

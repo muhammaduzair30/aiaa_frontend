@@ -57,4 +57,20 @@ class CVRepositoryImpl implements CVRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, String>> getDownloadUrl(String cvId) async {
+    try {
+      final url = await remoteDataSource.getDownloadUrl(cvId);
+      return Right(url);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

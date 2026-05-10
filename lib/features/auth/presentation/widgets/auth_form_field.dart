@@ -5,6 +5,7 @@ class AuthFormField extends StatelessWidget {
   final String labelText;
   final bool obscureText;
   final TextInputType keyboardType;
+  final Widget? prefixIcon;
 
   const AuthFormField({
     super.key,
@@ -12,6 +13,7 @@ class AuthFormField extends StatelessWidget {
     required this.labelText,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
+    this.prefixIcon,
   });
 
   @override
@@ -20,13 +22,10 @@ class AuthFormField extends StatelessWidget {
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      style: Theme.of(context).textTheme.bodyLarge,
       decoration: InputDecoration(
         labelText: labelText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        filled: true,
-        fillColor: Colors.grey.shade100,
+        prefixIcon: prefixIcon,
       ),
     );
   }

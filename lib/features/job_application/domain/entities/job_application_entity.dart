@@ -6,6 +6,8 @@ class JobApplicationEntity extends Equatable {
   final String cvId;
   final String jobId;
   final String? analysisId;
+  final String? cvFilename;
+  final String? jobTitle;
   final String status;
   final DateTime? appliedDate;
   final String? notes;
@@ -17,6 +19,8 @@ class JobApplicationEntity extends Equatable {
     required this.cvId,
     required this.jobId,
     this.analysisId,
+    this.cvFilename,
+    this.jobTitle,
     required this.status,
     this.appliedDate,
     this.notes,
@@ -24,5 +28,5 @@ class JobApplicationEntity extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, userId, cvId, jobId, analysisId, status, appliedDate, notes, createdAt];
+  List<Object?> get props => [id, userId, cvId, jobId, analysisId, cvFilename, jobTitle, status, appliedDate, notes, createdAt];
 }

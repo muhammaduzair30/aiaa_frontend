@@ -21,6 +21,7 @@ import '../../features/cv/data/datasources/cv_remote_datasource.dart';
 import '../../features/cv/domain/usecases/upload_cv_usecase.dart';
 import '../../features/cv/domain/usecases/get_cvs_usecase.dart';
 import '../../features/cv/domain/usecases/delete_cv_usecase.dart';
+import '../../features/cv/domain/usecases/get_download_url_usecase.dart';
 import '../../features/cv/presentation/cubit/cv_cubit.dart';
 
 // Job
@@ -123,6 +124,7 @@ Future<void> initInjection() async {
   sl.registerLazySingleton(() => UploadCVUseCase(sl()));
   sl.registerLazySingleton(() => GetCVsUseCase(sl()));
   sl.registerLazySingleton(() => DeleteCVUseCase(sl()));
+  sl.registerLazySingleton(() => GetDownloadUrlUseCase(sl()));
   // Job
   sl.registerLazySingleton(() => CreateJobUseCase(sl()));
   sl.registerLazySingleton(() => GetJobsUseCase(sl()));
@@ -153,6 +155,7 @@ Future<void> initInjection() async {
       uploadCVUseCase: sl(),
       getCVsUseCase: sl(),
       deleteCVUseCase: sl(),
+      getDownloadUrlUseCase: sl(),
     ),
   );
   sl.registerFactory(

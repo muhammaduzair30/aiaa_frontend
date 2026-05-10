@@ -83,10 +83,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw Exception('No refresh token available');
     }
 
-    final response = await dio.post(
+    // Use a clean Dio instance to prevent interceptor loops
+    final refreshDio = Dio(dio.options);
+    
+    final response = await refreshDio.post(
       '/auth/refresh',
       data: {'refresh_token': refreshToken},
-      options: Options(extra: {'is_refresh': true}),
     );
 
     final newAccessToken = response.data['access_token'];

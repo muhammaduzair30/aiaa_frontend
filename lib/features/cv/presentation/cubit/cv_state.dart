@@ -39,3 +39,21 @@ class CVError extends CVState {
   @override
   List<Object?> get props => [message];
 }
+
+class CVDownloadLoading extends CVState {
+  final String cvId;
+
+  const CVDownloadLoading(this.cvId);
+
+  @override
+  List<Object?> get props => [cvId];
+}
+
+class CVDownloadUrlReady extends CVState {
+  final String url;
+
+  const CVDownloadUrlReady(this.url);
+
+  @override
+  List<Object?> get props => [url];
+}

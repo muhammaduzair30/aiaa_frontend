@@ -39,11 +39,18 @@ class AuthInterceptor extends Interceptor {
         try {
           final newToken = await authDataSource.refreshToken();
           
-          err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-          err.requestOptions.extra['is_retry'] = true;
-          
-          final response = await dio.fetch(err.requestOptions);
-          return handler.resolve(response);
+          if (newToken.isNotEmpty) {
+            err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+            err.requestOptions.extra['is_retry'] = true;
+            
+            // Create a clean Dio instance for the retry to avoid interceptor loops
+            final retryDio = Dio(dio.options);
+            final response = await retryDio.fetch(err.requestOptions);
+            return handler.resolve(response);
+          } else {
+            await _handleLogout();
+            return handler.next(err);
+          }
         } catch (e) {
           await _handleLogout();
           return handler.next(err);

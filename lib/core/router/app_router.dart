@@ -7,7 +7,9 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/cv/presentation/screens/cv_upload_screen.dart';
 import '../../features/cv/presentation/screens/cv_list_screen.dart';
+import '../../features/cv/domain/entities/cv_entity.dart';
 import '../../features/job/presentation/screens/job_input_screen.dart';
+import '../../features/job/domain/entities/job_entity.dart';
 import '../../features/analysis/presentation/screens/analysis_screen.dart';
 import '../../features/analysis/presentation/screens/analysis_history_screen.dart';
 import '../../features/analysis/presentation/screens/result_screen.dart';
@@ -81,7 +83,20 @@ class AppRouter {
       ),
       GoRoute(
         path: '/analysis',
-        builder: (context, state) => const AnalysisScreen(),
+        builder: (context, state) {
+          final extra = state.extra;
+          String? preSelectedCvId;
+          JobEntity? preSelectedJob;
+          if (extra is CVEntity) {
+            preSelectedCvId = extra.id;
+          } else if (extra is JobEntity) {
+            preSelectedJob = extra;
+          }
+          return AnalysisScreen(
+            preSelectedCvId: preSelectedCvId,
+            preSelectedJob: preSelectedJob,
+          );
+        },
       ),
       GoRoute(
         path: '/analysis/history',

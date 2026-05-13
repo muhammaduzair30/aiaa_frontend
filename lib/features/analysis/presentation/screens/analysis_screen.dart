@@ -1,4 +1,5 @@
 import 'package:aiaa/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:aiaa/features/job/presentation/cubit/job_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -594,80 +595,666 @@ class _AnalysisScreenViewState extends State<_AnalysisScreenView> {
   // ─── Job Selector ─────────────────────────────────────────────────────────────
 
   Widget _buildJobSelector() {
-    return GestureDetector(
-      onTap: () async {
-        final result = await context.push<JobEntity>('/job/input');
-        if (result != null) {
-          setState(() => _selectedJob = result);
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: _selectedJob != null
-              ? const Color(0xFF1D9E75).withOpacity(0.08)
-              : Colors.white.withOpacity(0.04),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: _selectedJob != null
-                ? const Color(0xFF1D9E75).withOpacity(0.4)
-                : const Color(0xFF534AB7).withOpacity(0.3),
-            width: _selectedJob != null ? 1 : 0.5,
+    // If a job is already selected, show the selected state with a change button
+    if (_selectedJob != null) {
+      return GestureDetector(
+        onTap: () => _showJobSourcePicker(),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1D9E75).withOpacity(0.08),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: const Color(0xFF1D9E75).withOpacity(0.4),
+              width: 1,
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: _selectedJob != null
-                    ? const Color(0xFF1D9E75).withOpacity(0.15)
-                    : const Color(0xFF534AB7).withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1D9E75).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.check_circle_outline_rounded,
+                  color: Color(0xFF1D9E75),
+                  size: 18,
+                ),
               ),
-              child: Icon(
-                _selectedJob != null
-                    ? Icons.check_circle_outline_rounded
-                    : Icons.work_outline_rounded,
-                color: _selectedJob != null
-                    ? const Color(0xFF1D9E75)
-                    : const Color(0xFF8B82D4),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  _selectedJob!.jobTitle ?? 'Job description selected',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFEEEDFE),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const Icon(
+                Icons.swap_horiz_rounded,
+                color: Color(0xFF6B7089),
                 size: 18,
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                _selectedJob != null
-                    ? (_selectedJob!.jobTitle ?? 'Job description selected')
-                    : 'Paste text or import from URL',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight:
-                      _selectedJob != null ? FontWeight.w600 : FontWeight.w400,
-                  color: _selectedJob != null
-                      ? const Color(0xFFEEEDFE)
-                      : const Color(0xFF6B7089),
-                ),
-                overflow: TextOverflow.ellipsis,
+            ],
+          ),
+        ),
+      );
+    }
+
+    // No job selected — show two option cards
+    return Column(
+      children: [
+        // Option 1: Select from saved jobs
+        GestureDetector(
+          onTap: () => _showSavedJobsPicker(),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: const Color(0xFF534AB7).withOpacity(0.3),
+                width: 0.5,
               ),
             ),
-            Icon(
-              _selectedJob != null
-                  ? Icons.swap_horiz_rounded
-                  : Icons.arrow_forward_rounded,
-              color: _selectedJob != null
-                  ? const Color(0xFF6B7089)
-                  : const Color(0xFF534AB7),
-              size: 18,
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF534AB7).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.bookmark_outline_rounded,
+                    color: Color(0xFF8B82D4),
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Select from saved jobs',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFFEEEDFE),
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        'Choose a previously saved job description',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF6B7089),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_rounded,
+                  color: Color(0xFF534AB7),
+                  size: 18,
+                ),
+              ],
             ),
-          ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        // Option 2: Add a new job
+        GestureDetector(
+          onTap: () async {
+            final result = await context.push<JobEntity>('/job/input');
+            if (result != null) {
+              setState(() => _selectedJob = result);
+            }
+          },
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.08),
+                width: 0.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1D9E75).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.add_rounded,
+                    color: Color(0xFF1D9E75),
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Add new job',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFFEEEDFE),
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        'Paste text or import from URL',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF6B7089),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_rounded,
+                  color: Color(0xFF1D9E75),
+                  size: 18,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ─── Job Source Picker (when changing an already-selected job) ─────────────
+
+  void _showJobSourcePicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF13112A),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Change Job',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFFEEEDFE),
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Select from saved
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showSavedJobsPicker();
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: const Color(0xFF534AB7).withOpacity(0.3),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF534AB7).withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.bookmark_outline_rounded,
+                            color: Color(0xFF8B82D4), size: 18),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Select from saved jobs',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFEEEDFE),
+                          ),
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_rounded,
+                          color: Color(0xFF534AB7), size: 18),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Add new
+              GestureDetector(
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final result = await context.push<JobEntity>('/job/input');
+                  if (result != null) {
+                    setState(() => _selectedJob = result);
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.08),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1D9E75).withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.add_rounded,
+                            color: Color(0xFF1D9E75), size: 18),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Add new job',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFEEEDFE),
+                          ),
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_rounded,
+                          color: Color(0xFF1D9E75), size: 18),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  // ─── Saved Jobs Picker Bottom Sheet ───────────────────────────────────────
+
+  void _showSavedJobsPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF13112A),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => BlocProvider(
+        create: (_) => sl<JobCubit>()..loadJobs(),
+        child: DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.55,
+          minChildSize: 0.35,
+          maxChildSize: 0.85,
+          builder: (sheetContext, scrollController) => Column(
+            children: [
+              // Handle + header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF534AB7).withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.bookmark_outline_rounded,
+                              color: Color(0xFF8B82D4), size: 16),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Text(
+                            'Saved Jobs',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFEEEDFE),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(sheetContext),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.07),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.close_rounded,
+                                color: Color(0xFF6B7089), size: 16),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 48),
+                        child: Text(
+                          'Tap a job to use it for analysis',
+                          style:
+                              TextStyle(fontSize: 12, color: Color(0xFF6B7089)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Divider(
+                        color: Colors.white.withOpacity(0.07), thickness: 0.5),
+                  ],
+                ),
+              ),
+              // Job list
+              Expanded(
+                child: BlocBuilder<JobCubit, JobState>(
+                  builder: (ctx, state) {
+                    if (state is JobLoading) {
+                      return const Center(
+                        child:
+                            CircularProgressIndicator(color: Color(0xFF534AB7)),
+                      );
+                    }
+
+                    if (state is JobLoaded) {
+                      if (state.jobs.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 56,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEF9F27)
+                                        .withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: const Icon(Icons.work_off_outlined,
+                                      color: Color(0xFFEF9F27), size: 24),
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'No saved jobs yet',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFEEEDFE),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                  'Add a new job to get started',
+                                  style: TextStyle(
+                                      fontSize: 12, color: Color(0xFF6B7089)),
+                                ),
+                                const SizedBox(height: 20),
+                                GestureDetector(
+                                  onTap: () async {
+                                    Navigator.pop(ctx);
+                                    final result = await context
+                                        .push<JobEntity>('/job/input');
+                                    if (result != null) {
+                                      setState(() => _selectedJob = result);
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFF6C63E0),
+                                          Color(0xFF534AB7)
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.add_rounded,
+                                            color: Colors.white, size: 16),
+                                        SizedBox(width: 6),
+                                        Text(
+                                          'Add New Job',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        controller: scrollController,
+                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+                        itemCount: state.jobs.length,
+                        itemBuilder: (ctx, index) {
+                          final job = state.jobs[index];
+                          final isCurrentlySelected =
+                              _selectedJob?.id == job.id;
+                          final accent = _jobAccentColor(job.jobTitle);
+
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              setState(() => _selectedJob = job);
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              margin: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: isCurrentlySelected
+                                    ? const Color(0xFF534AB7).withOpacity(0.12)
+                                    : Colors.white.withOpacity(0.04),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isCurrentlySelected
+                                      ? const Color(0xFF534AB7).withOpacity(0.6)
+                                      : Colors.white.withOpacity(0.08),
+                                  width: isCurrentlySelected ? 1 : 0.5,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  // Job initials avatar
+                                  Container(
+                                    width: 42,
+                                    height: 42,
+                                    decoration: BoxDecoration(
+                                      color: accent.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(11),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        _jobInitials(job.jobTitle),
+                                        style: TextStyle(
+                                          color: accent,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          job.jobTitle ?? 'Untitled Job',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: isCurrentlySelected
+                                                ? FontWeight.w600
+                                                : FontWeight.w500,
+                                            color: const Color(0xFFEEEDFE),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Text(
+                                          job.rawText
+                                              .split('\n')
+                                              .first
+                                              .substring(
+                                                  0,
+                                                  job.rawText
+                                                              .split('\n')
+                                                              .first
+                                                              .length >
+                                                          60
+                                                      ? 60
+                                                      : job.rawText
+                                                          .split('\n')
+                                                          .first
+                                                          .length)
+                                              .trim(),
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            color: Color(0xFF6B7089),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (isCurrentlySelected)
+                                    Container(
+                                      width: 22,
+                                      height: 22,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Color(0xFF534AB7),
+                                      ),
+                                      child: const Icon(Icons.check_rounded,
+                                          color: Colors.white, size: 14),
+                                    )
+                                  else
+                                    const Icon(
+                                      Icons.chevron_right_rounded,
+                                      color: Color(0xFF4A4E6A),
+                                      size: 20,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }
+
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper methods for job accent colors and initials
+  Color _jobAccentColor(String? title) {
+    const colors = [
+      Color(0xFF534AB7),
+      Color(0xFF1D9E75),
+      Color(0xFF378ADD),
+      Color(0xFFEF9F27),
+      Color(0xFFD4537E),
+    ];
+    if (title == null || title.isEmpty) return colors[0];
+    return colors[title.codeUnitAt(0) % colors.length];
+  }
+
+  String _jobInitials(String? title) {
+    if (title == null || title.isEmpty) return 'J';
+    final words = title.trim().split(' ');
+    if (words.length >= 2) {
+      return '${words[0][0]}${words[1][0]}'.toUpperCase();
+    }
+    return words[0][0].toUpperCase();
   }
 
   // ─── Job Preview ──────────────────────────────────────────────────────────────

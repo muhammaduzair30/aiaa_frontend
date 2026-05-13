@@ -10,8 +10,9 @@ class StructuredContentViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          contentBlocks.map((block) => _buildBlock(context, block)).toList(),
+      children: contentBlocks
+          .map((block) => _buildBlock(context, block))
+          .toList(),
     );
   }
 
@@ -84,8 +85,10 @@ class StructuredContentViewer extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.03),
               borderRadius: BorderRadius.circular(8),
-              border:
-                  Border.all(color: Colors.white.withOpacity(0.06), width: 0.5),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.06),
+                width: 0.5,
+              ),
             ),
             child: SelectableText(
               block.content.toString(),
@@ -103,20 +106,23 @@ class StructuredContentViewer extends StatelessWidget {
       case 'paragraph':
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: SelectableText(
-            block.content.toString(),
-            style: const TextStyle(
-              fontSize: 13,
-              color: Color(0xFFAAAABB),
-              height: 1.75,
-              fontWeight: FontWeight.w400,
+          child: SelectableText.rich(
+            _parseInlineMarkdown(
+              block.content.toString(),
+              const TextStyle(
+                fontSize: 13,
+                color: Color(0xFFAAAABB),
+                height: 1.75,
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ),
         );
 
       case 'list':
-        final listItems =
-            (block.content as List).map((e) => e.toString()).toList();
+        final listItems = (block.content as List)
+            .map((e) => e.toString())
+            .toList();
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: Column(
@@ -140,12 +146,14 @@ class StructuredContentViewer extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: SelectableText(
-                        entry.value,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFFAAAABB),
-                          height: 1.65,
+                      child: SelectableText.rich(
+                        _parseInlineMarkdown(
+                          entry.value,
+                          const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFFAAAABB),
+                            height: 1.65,
+                          ),
                         ),
                       ),
                     ),
@@ -191,15 +199,60 @@ class StructuredContentViewer extends StatelessWidget {
       default:
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
-          child: SelectableText(
-            block.content.toString(),
-            style: const TextStyle(
-              fontSize: 13,
-              color: Color(0xFF9CA3AF),
-              height: 1.6,
+          child: SelectableText.rich(
+            _parseInlineMarkdown(
+              block.content.toString(),
+              const TextStyle(
+                fontSize: 13,
+                color: Color(0xFF9CA3AF),
+                height: 1.6,
+              ),
             ),
           ),
         );
     }
+  }
+
+  /// Parses inline markdown bold syntax (**text**) and returns a
+  /// [TextSpan] tree with proper [FontWeight.w700] styling applied.
+  TextSpan _parseInlineMarkdown(String text, TextStyle baseStyle) {
+    final regex = RegExp(r'\*\*(.+?)\*\*');
+    final spans = <InlineSpan>[];
+    int lastEnd = 0;
+
+    for (final match in regex.allMatches(text)) {
+      // Add any normal text before this bold segment
+      if (match.start > lastEnd) {
+        spans.add(
+          TextSpan(
+            text: text.substring(lastEnd, match.start),
+            style: baseStyle,
+          ),
+        );
+      }
+      // Add the bold segment (without the ** markers)
+      spans.add(
+        TextSpan(
+          text: match.group(1),
+          style: baseStyle.copyWith(
+            fontWeight: FontWeight.w700,
+            color: const Color(0xFFEEEDFE),
+          ),
+        ),
+      );
+      lastEnd = match.end;
+    }
+
+    // Add any remaining normal text after the last match
+    if (lastEnd < text.length) {
+      spans.add(TextSpan(text: text.substring(lastEnd), style: baseStyle));
+    }
+
+    // If no bold markers found, return the whole text as a single span
+    if (spans.isEmpty) {
+      return TextSpan(text: text, style: baseStyle);
+    }
+
+    return TextSpan(children: spans);
   }
 }

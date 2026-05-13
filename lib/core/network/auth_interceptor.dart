@@ -63,12 +63,12 @@ class AuthInterceptor extends Interceptor {
       if (newToken != null && newToken.isNotEmpty) {
         // Retry the original request with the fresh token
         err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-        
+
         // We use a clean Dio for the retry to avoid interceptor recursion
-        final retryDio = Dio(err.requestOptions.baseUrl.isEmpty 
-            ? BaseOptions() 
+        final retryDio = Dio(err.requestOptions.baseUrl.isEmpty
+            ? BaseOptions()
             : BaseOptions(baseUrl: err.requestOptions.baseUrl));
-            
+
         final response = await retryDio.fetch(err.requestOptions);
         return handler.resolve(response);
       }
@@ -95,7 +95,8 @@ class AuthInterceptor extends Interceptor {
     String? newToken;
 
     try {
-      debugPrint('[AuthInterceptor] Refreshing access token via AuthDataSource…');
+      debugPrint(
+          '[AuthInterceptor] Refreshing access token via AuthDataSource…');
       newToken = await authDataSource.refreshToken();
       _refreshCompleter!.complete(newToken);
     } catch (e) {
@@ -128,6 +129,4 @@ class AuthInterceptor extends Interceptor {
       AppRouter.router.go('/login');
     }
   }
-}
-
 }

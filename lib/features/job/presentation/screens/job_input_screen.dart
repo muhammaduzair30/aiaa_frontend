@@ -52,7 +52,8 @@ class _JobInputScreenState extends State<JobInputScreen>
 
   void _onSaveJobPressed() {
     if (_rawTextController.text.isNotEmpty) {
-      final sourceUrl = _activeTab == 0 ? _sourceUrlController.text : _urlController.text;
+      final sourceUrl =
+          _activeTab == 0 ? _sourceUrlController.text : _urlController.text;
       context.read<JobCubit>().createJob(
             _titleController.text.isNotEmpty ? _titleController.text : null,
             _rawTextController.text,
@@ -72,12 +73,15 @@ class _JobInputScreenState extends State<JobInputScreen>
           if (state is JobError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message,
-                    style: const TextStyle(color: Color(0xFFEEEDFE))),
+                content: Text(
+                  state.message,
+                  style: const TextStyle(color: Color(0xFFEEEDFE)),
+                ),
                 backgroundColor: const Color(0xFF1A1730),
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             );
           } else if (state is JobScraped) {
@@ -90,17 +94,23 @@ class _JobInputScreenState extends State<JobInputScreen>
               SnackBar(
                 content: const Row(
                   children: [
-                    Icon(Icons.check_circle_outline,
-                        color: Color(0xFF1D9E75), size: 18),
+                    Icon(
+                      Icons.check_circle_outline,
+                      color: Color(0xFF1D9E75),
+                      size: 18,
+                    ),
                     SizedBox(width: 10),
-                    Text('Job saved successfully!',
-                        style: TextStyle(color: Color(0xFFEEEDFE))),
+                    Text(
+                      'Job saved successfully!',
+                      style: TextStyle(color: Color(0xFFEEEDFE)),
+                    ),
                   ],
                 ),
                 backgroundColor: const Color(0xFF1A1730),
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             );
             context.pop(state.job);
@@ -148,8 +158,10 @@ class _JobInputScreenState extends State<JobInputScreen>
           width: 300,
           decoration: BoxDecoration(
             border: Border(
-              left:
-                  BorderSide(color: Colors.white.withOpacity(0.06), width: 0.5),
+              left: BorderSide(
+                color: Colors.white.withOpacity(0.06),
+                width: 0.5,
+              ),
             ),
           ),
           child: const _TipsPanel(),
@@ -202,10 +214,15 @@ class _JobInputScreenState extends State<JobInputScreen>
                 color: Colors.white.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                    color: Colors.white.withOpacity(0.08), width: 0.5),
+                  color: Colors.white.withOpacity(0.08),
+                  width: 0.5,
+                ),
               ),
-              child: const Icon(Icons.arrow_back_rounded,
-                  color: Color(0xFF8B82D4), size: 18),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: Color(0xFF8B82D4),
+                size: 18,
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -412,7 +429,7 @@ class _JobInputScreenState extends State<JobInputScreen>
         const SizedBox(height: 8),
         _buildAnimatedField(
           controller: _sourceUrlController,
-          hint: 'e.g. https://linkedin.com/jobs/view/...',
+          hint: 'e.g. https://boards.greenhouse.io/...',
           icon: Icons.link_rounded,
           isFocused: _sourceUrlFocused,
           onFocusChange: (v) => setState(() => _sourceUrlFocused = v),
@@ -433,7 +450,7 @@ class _JobInputScreenState extends State<JobInputScreen>
         const SizedBox(height: 8),
         _buildAnimatedField(
           controller: _urlController,
-          hint: 'https://linkedin.com/jobs/view/...',
+          hint: 'https://boards.greenhouse.io/...',
           icon: Icons.link_rounded,
           isFocused: _urlFocused,
           onFocusChange: (v) => setState(() => _urlFocused = v),
@@ -453,14 +470,18 @@ class _JobInputScreenState extends State<JobInputScreen>
                     color: const Color(0xFF534AB7).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                        color: const Color(0xFF534AB7).withOpacity(0.3),
-                        width: 0.5),
+                      color: const Color(0xFF534AB7).withOpacity(0.3),
+                      width: 0.5,
+                    ),
                   ),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.download_rounded,
-                          color: Color(0xFF8B82D4), size: 18),
+                      Icon(
+                        Icons.download_rounded,
+                        color: Color(0xFF8B82D4),
+                        size: 18,
+                      ),
                       SizedBox(width: 8),
                       Text(
                         'Import job description',
@@ -476,62 +497,41 @@ class _JobInputScreenState extends State<JobInputScreen>
               ),
 
         const SizedBox(height: 16),
-        _buildPlatformPills(),
-      ],
-    );
-  }
 
-  // ─── Platform Pills ──────────────────────────────────────────────────────────
-
-  Widget _buildPlatformPills() {
-    final platforms = [
-      'LinkedIn',
-      'Indeed',
-      'Glassdoor',
-      'Remote.co',
-      'Others'
-    ];
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.06), width: 0.5),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'SUPPORTED PLATFORMS',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1,
-              color: Color(0xFF6B7089),
+        // Scraping Notice
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF378ADD).withOpacity(0.08),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: const Color(0xFF378ADD).withOpacity(0.3),
+              width: 0.5,
             ),
           ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: platforms
-                .map((p) => Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.04),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                            color: Colors.white.withOpacity(0.08), width: 0.5),
-                      ),
-                      child: Text(p,
-                          style: const TextStyle(
-                              fontSize: 11, color: Color(0xFFAAAABB))),
-                    ))
-                .toList(),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.info_outline_rounded,
+                color: Color(0xFF378ADD),
+                size: 16,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Automated extraction works best on platforms that permit scraping. Sites with aggressive bot-protection may require you to use the "Paste text" tab.',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: const Color(0xFFEEEDFE).withOpacity(0.8),
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -540,7 +540,11 @@ class _JobInputScreenState extends State<JobInputScreen>
   Widget _buildSaveBar({required bool isLoading, required bool isWeb}) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-          isWeb ? 40 : 20, 16, isWeb ? 40 : 20, isWeb ? 24 : 28),
+        isWeb ? 40 : 20,
+        16,
+        isWeb ? 40 : 20,
+        isWeb ? 24 : 28,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFF0D0B1E),
         border: Border(
@@ -572,8 +576,11 @@ class _JobInputScreenState extends State<JobInputScreen>
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.bookmark_add_outlined,
-                        color: Colors.white, size: 18),
+                    Icon(
+                      Icons.bookmark_add_outlined,
+                      color: Colors.white,
+                      size: 18,
+                    ),
                     SizedBox(width: 8),
                     Text(
                       'Save Job',
@@ -658,7 +665,9 @@ class _JobInputScreenState extends State<JobInputScreen>
         color: const Color(0xFF534AB7).withOpacity(0.1),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-            color: const Color(0xFF534AB7).withOpacity(0.2), width: 0.5),
+          color: const Color(0xFF534AB7).withOpacity(0.2),
+          width: 0.5,
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -667,14 +676,19 @@ class _JobInputScreenState extends State<JobInputScreen>
             width: 18,
             height: 18,
             child: CircularProgressIndicator(
-                color: Color(0xFF8B82D4), strokeWidth: 2),
+              color: Color(0xFF8B82D4),
+              strokeWidth: 2,
+            ),
           ),
           const SizedBox(width: 12),
-          Text(message,
-              style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF8B82D4),
-                  fontWeight: FontWeight.w500)),
+          Text(
+            message,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF8B82D4),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -700,7 +714,7 @@ class _TipsPanel extends StatelessWidget {
         icon: Icons.link_rounded,
         title: 'URL import',
         body:
-            'Paste a direct URL from LinkedIn, Indeed or Glassdoor to auto-extract.',
+            'Paste a direct URL from supported platforms or company career pages to auto-extract.',
         color: const Color(0xFF378ADD),
       ),
       (
@@ -734,44 +748,50 @@ class _TipsPanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          ...tips.map((t) => Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: t.color.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(t.icon, color: t.color, size: 16),
+          ...tips.map(
+            (t) => Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: t.color.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(t.title,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFFEEEDFE),
-                              )),
-                          const SizedBox(height: 4),
-                          Text(t.body,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF6B7089),
-                                height: 1.5,
-                              )),
-                        ],
-                      ),
+                    child: Icon(t.icon, color: t.color, size: 16),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          t.title,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFEEEDFE),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          t.body,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF6B7089),
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

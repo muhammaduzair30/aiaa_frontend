@@ -201,68 +201,84 @@ class _WebSidebar extends StatelessWidget {
             ),
           ),
           // Bottom user section
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.04),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                    color: Colors.white.withOpacity(0.07), width: 0.5),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF534AB7), Color(0xFF1D9E75)],
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              final user = state is AuthAuthenticated ? state.user : null;
+              final fullName = user?.fullName ?? 'My Account';
+              final initial =
+                  fullName.isNotEmpty ? fullName[0].toUpperCase() : 'U';
+
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: Colors.white.withOpacity(0.07), width: 0.5),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF6C63E0), Color(0xFF1D9E75)],
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(initial,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13)),
+                        ),
                       ),
-                    ),
-                    child: const Center(
-                      child: Text('U',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13)),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('My Account',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFFEEEDFE))),
-                        Text('Pro',
-                            style: TextStyle(
-                                fontSize: 10, color: Color(0xFF6B7089))),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      context.read<AuthBloc>().add(AuthLogoutRequested());
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(8),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(fullName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFEEEDFE))),
+                            if (user?.email != null)
+                              Text(user!.email,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: const Color(0xFFEEEDFE)
+                                          .withOpacity(0.4))),
+                          ],
+                        ),
                       ),
-                      child: const Icon(Icons.logout_rounded,
-                          size: 16, color: Color(0xFF4A4E6A)),
-                    ),
+                      GestureDetector(
+                        onTap: () {
+                          context.read<AuthBloc>().add(AuthLogoutRequested());
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.logout_rounded,
+                              size: 16, color: Color(0xFFE24B4A)),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -353,22 +369,27 @@ class _HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-            create: (_) => sl<JobApplicationCubit>()..loadApplications()),
-        BlocProvider(create: (_) => sl<AnalysisCubit>()..loadHistory()),
-        BlocProvider(create: (_) => sl<CVCubit>()..loadCVs()),
-      ],
-      child: const _HomeTabView(),
-    );
+    return const _HomeTabView();
   }
 }
 
 // ─── Home Tab View ────────────────────────────────────────────────────────────
 
-class _HomeTabView extends StatelessWidget {
+class _HomeTabView extends StatefulWidget {
   const _HomeTabView();
+
+  @override
+  State<_HomeTabView> createState() => _HomeTabViewState();
+}
+
+class _HomeTabViewState extends State<_HomeTabView> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<JobApplicationCubit>().loadApplications();
+    context.read<AnalysisCubit>().loadHistory();
+    context.read<CVCubit>().loadCVs();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -470,40 +491,46 @@ class _DashboardHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Good morning 👋',
-              style: TextStyle(
-                fontSize: isWeb ? 28 : 22,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFFEEEDFE),
-                letterSpacing: -0.5,
-              ),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              "Here's your job hunt overview",
-              style: TextStyle(fontSize: 13, color: Color(0xFF6B7089)),
-            ),
-          ],
+        BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            final user = state is AuthAuthenticated ? state.user : null;
+            final firstName = user?.fullName.split(' ').first ?? 'there';
+
+            final hour = DateTime.now().hour;
+            String greeting;
+
+            if (hour < 12) {
+              greeting = 'Good morning';
+            } else if (hour < 17) {
+              greeting = 'Good afternoon';
+            } else {
+              greeting = 'Good evening';
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$greeting, $firstName',
+                  style: TextStyle(
+                    fontSize: isWeb ? 28 : 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFFEEEDFE),
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  "Here's your job hunt overview",
+                  style: TextStyle(fontSize: 13, color: Color(0xFF6B7089)),
+                ),
+              ],
+            );
+          },
         ),
         Row(
           children: [
-            // Notification bell
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
-                border:
-                    Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
-              ),
-              child: const Icon(Icons.notifications_outlined,
-                  color: Color(0xFF6B7089), size: 18),
-            ),
+            // Notification bell removed
             if (!isWeb) ...[
               const SizedBox(width: 12),
               GestureDetector(
@@ -516,8 +543,8 @@ class _DashboardHeader extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
-                    border:
-                        Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
+                    border: Border.all(
+                        color: Colors.white.withOpacity(0.08), width: 0.5),
                   ),
                   child: const Icon(Icons.logout_rounded,
                       color: Color(0xFFE24B4A), size: 18),

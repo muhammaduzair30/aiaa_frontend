@@ -12,15 +12,23 @@ class JobsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<JobCubit>()..loadJobs(),
-      child: const _JobsListScreenView(),
-    );
+    return const _JobsListScreenView();
   }
 }
 
-class _JobsListScreenView extends StatelessWidget {
+class _JobsListScreenView extends StatefulWidget {
   const _JobsListScreenView();
+
+  @override
+  State<_JobsListScreenView> createState() => _JobsListScreenViewState();
+}
+
+class _JobsListScreenViewState extends State<_JobsListScreenView> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<JobCubit>().loadJobs();
+  }
 
   @override
   Widget build(BuildContext context) {

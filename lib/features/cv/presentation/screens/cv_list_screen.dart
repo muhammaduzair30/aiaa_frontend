@@ -13,10 +13,7 @@ class CVListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<CVCubit>(),
-      child: const _CVListScreenView(),
-    );
+    return const _CVListScreenView();
   }
 }
 

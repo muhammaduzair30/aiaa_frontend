@@ -72,7 +72,6 @@ Future<void> initInjection() async {
   sl.registerLazySingleton<AuthInterceptor>(
     () => AuthInterceptor(
       secureStorage: sl(),
-      dio: sl(),
       authDataSource: sl(),
     ),
   );

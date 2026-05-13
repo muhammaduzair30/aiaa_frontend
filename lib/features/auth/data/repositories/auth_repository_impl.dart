@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/exceptions.dart';
+import 'package:dio/dio.dart';
+import '../../../../core/errors/dio_error_handler.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -15,12 +16,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final user = await remoteDataSource.login(email, password);
       return Right(user);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(e.message));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -31,10 +28,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final user = await remoteDataSource.register(email, fullName, password);
       return Right(user);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -55,12 +50,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final user = await remoteDataSource.getCurrentUser();
       return Right(user);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(e.message));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

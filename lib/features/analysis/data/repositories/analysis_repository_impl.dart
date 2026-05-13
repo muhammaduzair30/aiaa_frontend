@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/exceptions.dart';
+import 'package:dio/dio.dart';
+import '../../../../core/errors/dio_error_handler.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/analysis_entity.dart';
 import '../../domain/repositories/analysis_repository.dart';
@@ -15,10 +16,11 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
     try {
       final analysis = await remoteDataSource.runAnalysis(cvId, jdText, jobId);
       return Right(analysis);
-    } on AuthException catch (e) { return Left(AuthFailure(e.message)); }
-    on ServerException catch (e) { return Left(ServerFailure(e.message)); }
-    on NetworkException catch (e) { return Left(NetworkFailure(e.message)); }
-    catch (e) { return Left(ServerFailure(e.toString())); }
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
@@ -26,10 +28,11 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
     try {
       final history = await remoteDataSource.getHistory();
       return Right(history);
-    } on AuthException catch (e) { return Left(AuthFailure(e.message)); }
-    on ServerException catch (e) { return Left(ServerFailure(e.message)); }
-    on NetworkException catch (e) { return Left(NetworkFailure(e.message)); }
-    catch (e) { return Left(ServerFailure(e.toString())); }
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
@@ -37,9 +40,10 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
     try {
       final analysis = await remoteDataSource.getAnalysis(id);
       return Right(analysis);
-    } on AuthException catch (e) { return Left(AuthFailure(e.message)); }
-    on ServerException catch (e) { return Left(ServerFailure(e.message)); }
-    on NetworkException catch (e) { return Left(NetworkFailure(e.message)); }
-    catch (e) { return Left(ServerFailure(e.toString())); }
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 }

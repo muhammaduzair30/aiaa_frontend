@@ -1,7 +1,6 @@
+import 'package:aiaa/core/constants/api_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import '../constants/api_constants.dart';
-import '../errors/exceptions.dart';
 import 'auth_interceptor.dart';
 
 class DioClient {
@@ -15,8 +14,12 @@ class DioClient {
       'Content-Type': 'application/json',
     };
 
+    // 1. Auth interceptor — attaches token & handles 401 refresh
     dio.interceptors.add(authInterceptor);
 
+    // 2. Logger — logs full request / response / error details to the
+    //    debug console. No error-mapping interceptor after this; error
+    //    mapping is done in the repository layer via mapDioExceptionToFailure.
     dio.interceptors.add(
       PrettyDioLogger(
         requestHeader: true,
@@ -26,30 +29,6 @@ class DioClient {
         error: true,
         compact: true,
         maxWidth: 90,
-      ),
-    );
-
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onError: (DioException err, ErrorInterceptorHandler handler) {
-          switch (err.type) {
-            case DioExceptionType.connectionTimeout:
-            case DioExceptionType.sendTimeout:
-            case DioExceptionType.receiveTimeout:
-            case DioExceptionType.connectionError:
-              throw NetworkException(message: 'Connection timeout with server');
-            case DioExceptionType.badResponse:
-              final statusCode = err.response?.statusCode;
-              if (statusCode == 401 || statusCode == 403) {
-                throw AuthException(message: 'Authentication failed');
-              } else {
-                throw ServerException(message: 'Server error: $statusCode');
-              }
-            default:
-              throw ServerException(
-                  message: 'Unexpected error occurred: ${err.message}');
-          }
-        },
       ),
     );
   }

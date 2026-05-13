@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/exceptions.dart';
+import 'package:dio/dio.dart';
+import '../../../../core/errors/dio_error_handler.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/job_application_entity.dart';
 import '../../domain/repositories/job_application_repository.dart';
@@ -15,10 +16,11 @@ class JobApplicationRepositoryImpl implements JobApplicationRepository {
     try {
       final app = await remoteDataSource.createApplication(cvId, jobId, analysisId, status, notes);
       return Right(app);
-    } on AuthException catch (e) { return Left(AuthFailure(e.message)); }
-    on ServerException catch (e) { return Left(ServerFailure(e.message)); }
-    on NetworkException catch (e) { return Left(NetworkFailure(e.message)); }
-    catch (e) { return Left(ServerFailure(e.toString())); }
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
@@ -26,10 +28,11 @@ class JobApplicationRepositoryImpl implements JobApplicationRepository {
     try {
       final apps = await remoteDataSource.getApplications();
       return Right(apps);
-    } on AuthException catch (e) { return Left(AuthFailure(e.message)); }
-    on ServerException catch (e) { return Left(ServerFailure(e.message)); }
-    on NetworkException catch (e) { return Left(NetworkFailure(e.message)); }
-    catch (e) { return Left(ServerFailure(e.toString())); }
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
@@ -37,10 +40,11 @@ class JobApplicationRepositoryImpl implements JobApplicationRepository {
     try {
       final app = await remoteDataSource.getApplication(id);
       return Right(app);
-    } on AuthException catch (e) { return Left(AuthFailure(e.message)); }
-    on ServerException catch (e) { return Left(ServerFailure(e.message)); }
-    on NetworkException catch (e) { return Left(NetworkFailure(e.message)); }
-    catch (e) { return Left(ServerFailure(e.toString())); }
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
@@ -48,10 +52,26 @@ class JobApplicationRepositoryImpl implements JobApplicationRepository {
     try {
       final app = await remoteDataSource.updateApplication(id, status, notes, appliedDate);
       return Right(app);
-    } on AuthException catch (e) { return Left(AuthFailure(e.message)); }
-    on ServerException catch (e) { return Left(ServerFailure(e.message)); }
-    on NetworkException catch (e) { return Left(NetworkFailure(e.message)); }
-    catch (e) { return Left(ServerFailure(e.toString())); }
+    } on DioException catch (e) {
+      // On Flutter Web, PATCH requests can trigger an XMLHttpRequest onError
+      // (connectionError) due to CORS, even when the backend successfully
+      // processes the request.  When this happens, verify the update by
+      // re-fetching the resource before reporting an error.
+      if (e.type == DioExceptionType.connectionError) {
+        try {
+          final refreshed = await remoteDataSource.getApplication(id);
+          if (refreshed.status == status) {
+            // Backend applied the update — return success.
+            return Right(refreshed);
+          }
+        } catch (_) {
+          // Verification fetch also failed — fall through to original error.
+        }
+      }
+      return Left(mapDioExceptionToFailure(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
@@ -59,9 +79,10 @@ class JobApplicationRepositoryImpl implements JobApplicationRepository {
     try {
       await remoteDataSource.deleteApplication(id);
       return const Right(unit);
-    } on AuthException catch (e) { return Left(AuthFailure(e.message)); }
-    on ServerException catch (e) { return Left(ServerFailure(e.message)); }
-    on NetworkException catch (e) { return Left(NetworkFailure(e.message)); }
-    catch (e) { return Left(ServerFailure(e.toString())); }
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 }

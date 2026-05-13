@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/exceptions.dart';
+import 'package:dio/dio.dart';
+import '../../../../core/errors/dio_error_handler.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/cv_entity.dart';
 import '../../domain/repositories/cv_repository.dart';
@@ -15,12 +16,8 @@ class CVRepositoryImpl implements CVRepository {
     try {
       final cv = await remoteDataSource.uploadCV(bytes, fileName);
       return Right(cv);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(e.message));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -31,12 +28,8 @@ class CVRepositoryImpl implements CVRepository {
     try {
       final cvs = await remoteDataSource.getCVs();
       return Right(cvs);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(e.message));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -47,12 +40,8 @@ class CVRepositoryImpl implements CVRepository {
     try {
       await remoteDataSource.deleteCV(id);
       return const Right(unit);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(e.message));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -63,12 +52,8 @@ class CVRepositoryImpl implements CVRepository {
     try {
       final url = await remoteDataSource.getDownloadUrl(cvId);
       return Right(url);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(e.message));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+    } on DioException catch (e) {
+      return Left(mapDioExceptionToFailure(e));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

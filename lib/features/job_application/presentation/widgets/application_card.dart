@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../domain/entities/job_application_entity.dart';
 
-class ApplicationCard extends StatelessWidget {
+class ApplicationCard extends StatefulWidget {
   final JobApplicationEntity application;
   final bool isGrid;
 
@@ -11,6 +11,13 @@ class ApplicationCard extends StatelessWidget {
     required this.application,
     this.isGrid = false,
   });
+
+  @override
+  State<ApplicationCard> createState() => _ApplicationCardState();
+}
+
+class _ApplicationCardState extends State<ApplicationCard> {
+  bool _isHovered = false;
 
   Color _statusColor(String status) {
     switch (status.toLowerCase()) {
@@ -53,18 +60,40 @@ class ApplicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _statusColor(application.status);
+    final color = _statusColor(widget.application.status);
 
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withOpacity(0.07), width: 0.5),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: _isHovered
+              ? Colors.white.withOpacity(0.06)
+              : Colors.white.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: _isHovered
+                ? Colors.white.withOpacity(0.12)
+                : Colors.white.withOpacity(0.07),
+            width: 0.5,
+          ),
+          boxShadow: _isHovered
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : [],
+        ),
+        child:
+            widget.isGrid ? _buildGridContent(color) : _buildListContent(color),
       ),
-      child: isGrid
-          ? _buildGridContent(color)
-          : _buildListContent(color),
     );
   }
 
@@ -85,13 +114,13 @@ class ApplicationCard extends StatelessWidget {
               child: const Icon(Icons.work_outline_rounded,
                   color: Color(0xFF8B82D4), size: 20),
             ),
-            _StatusBadge(status: application.status, color: color),
+            _StatusBadge(status: widget.application.status, color: color),
           ],
         ),
         const Spacer(),
         // Job title
         Text(
-          application.jobTitle ?? 'Untitled Job',
+          widget.application.jobTitle ?? 'Untitled Job',
           style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
@@ -109,7 +138,7 @@ class ApplicationCard extends StatelessWidget {
             const SizedBox(width: 4),
             Expanded(
               child: Text(
-                application.cvFilename ?? 'CV',
+                widget.application.cvFilename ?? 'CV',
                 style: const TextStyle(fontSize: 11, color: Color(0xFF6B7089)),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -125,12 +154,12 @@ class ApplicationCard extends StatelessWidget {
                 size: 10, color: Color(0xFF4A4E6A)),
             const SizedBox(width: 4),
             Text(
-              application.appliedDate != null
-                  ? _formatDate(application.appliedDate)
-                  : _formatDate(application.createdAt),
+              widget.application.appliedDate != null
+                  ? _formatDate(widget.application.appliedDate)
+                  : _formatDate(widget.application.createdAt),
               style: const TextStyle(fontSize: 10, color: Color(0xFF4A4E6A)),
             ),
-            if (application.analysisId != null) ...[
+            if (widget.application.analysisId != null) ...[
               const Spacer(),
               const Icon(Icons.insights_rounded,
                   size: 12, color: Color(0xFF534AB7)),
@@ -155,7 +184,7 @@ class ApplicationCard extends StatelessWidget {
                 color: color.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(_statusIcon(application.status),
+              child: Icon(_statusIcon(widget.application.status),
                   color: color, size: 20),
             ),
             const SizedBox(width: 14),
@@ -165,7 +194,7 @@ class ApplicationCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    application.jobTitle ?? 'Untitled Job',
+                    widget.application.jobTitle ?? 'Untitled Job',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -181,7 +210,7 @@ class ApplicationCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          application.cvFilename ?? 'CV',
+                          widget.application.cvFilename ?? 'CV',
                           style: const TextStyle(
                               fontSize: 11, color: Color(0xFF6B7089)),
                           overflow: TextOverflow.ellipsis,
@@ -197,7 +226,7 @@ class ApplicationCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _StatusBadge(status: application.status, color: color),
+                _StatusBadge(status: widget.application.status, color: color),
                 const SizedBox(height: 8),
                 const Icon(Icons.chevron_right_rounded,
                     color: Color(0xFF4A4E6A), size: 18),
@@ -222,13 +251,12 @@ class ApplicationCard extends StatelessWidget {
                   size: 10, color: Color(0xFF6B7089)),
               const SizedBox(width: 4),
               Text(
-                application.appliedDate != null
-                    ? 'Applied ${_formatDate(application.appliedDate)}'
-                    : 'Saved ${_formatDate(application.createdAt)}',
-                style:
-                    const TextStyle(fontSize: 11, color: Color(0xFF6B7089)),
+                widget.application.appliedDate != null
+                    ? 'Applied ${_formatDate(widget.application.appliedDate)}'
+                    : 'Saved ${_formatDate(widget.application.createdAt)}',
+                style: const TextStyle(fontSize: 11, color: Color(0xFF6B7089)),
               ),
-              if (application.analysisId != null) ...[
+              if (widget.application.analysisId != null) ...[
                 const Spacer(),
                 Container(
                   padding:
@@ -255,9 +283,9 @@ class ApplicationCard extends StatelessWidget {
                   ),
                 ),
               ],
-              if (application.notes != null &&
-                  application.notes!.isNotEmpty) ...[
-                if (application.analysisId == null) const Spacer(),
+              if (widget.application.notes != null &&
+                  widget.application.notes!.isNotEmpty) ...[
+                if (widget.application.analysisId == null) const Spacer(),
                 const SizedBox(width: 8),
                 const Icon(Icons.sticky_note_2_outlined,
                     size: 12, color: Color(0xFF4A4E6A)),

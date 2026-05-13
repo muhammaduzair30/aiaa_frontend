@@ -97,7 +97,7 @@ class _CVUploadScreenState extends State<CVUploadScreen>
                     borderRadius: BorderRadius.circular(12)),
               ),
             );
-            context.go('/cv/list');
+            context.pop();
           } else if (state is CVError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

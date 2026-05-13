@@ -15,14 +15,7 @@ class ApplicationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => sl<JobApplicationCubit>()),
-        BlocProvider(create: (_) => sl<CVCubit>()..loadCVs()),
-        BlocProvider(create: (_) => sl<JobCubit>()..loadJobs()),
-      ],
-      child: const _ApplicationsScreenView(),
-    );
+    return const _ApplicationsScreenView();
   }
 }
 

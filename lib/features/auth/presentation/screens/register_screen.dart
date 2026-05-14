@@ -239,8 +239,7 @@ class _WebLayout extends StatelessWidget {
                               _OnboardingStep(
                                 number: '01',
                                 title: 'Create your account',
-                                subtitle:
-                                    'Quick setup, no credit card required.',
+                                subtitle: 'Set up your profile in seconds.',
                               ),
                               const SizedBox(height: 20),
                               _OnboardingStep(

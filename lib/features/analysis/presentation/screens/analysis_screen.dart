@@ -1,4 +1,3 @@
-import 'package:aiaa/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:aiaa/features/job/presentation/cubit/job_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -228,30 +227,35 @@ class _AnalysisScreenViewState extends State<_AnalysisScreenView> {
             ),
           ),
           const SizedBox(width: 16),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'New Analysis',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFFEEEDFE),
-                  letterSpacing: -0.4,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'New Analysis',
+                  style: TextStyle(
+                    fontSize: isWeb ? 20 : 18,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFFEEEDFE),
+                    letterSpacing: -0.4,
+                  ),
                 ),
-              ),
-              SizedBox(height: 2),
-              Text(
-                'Match your CV against a job description',
-                style: TextStyle(fontSize: 12, color: Color(0xFF6B7089)),
-              ),
-            ],
+                const SizedBox(height: 2),
+                const Text(
+                  'Match your CV against a job description',
+                  style: TextStyle(fontSize: 12, color: Color(0xFF6B7089)),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: () => context.push('/analysis/history'),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: EdgeInsets.symmetric(
+                  horizontal: isWeb ? 14 : 10, vertical: 8),
               decoration: BoxDecoration(
                 color: const Color(0xFF534AB7).withOpacity(0.15),
                 borderRadius: BorderRadius.circular(10),
@@ -259,44 +263,26 @@ class _AnalysisScreenViewState extends State<_AnalysisScreenView> {
                     color: const Color(0xFF534AB7).withOpacity(0.3),
                     width: 0.5),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.history_rounded,
+                  const Icon(Icons.history_rounded,
                       color: Color(0xFF8B82D4), size: 16),
-                  SizedBox(width: 6),
-                  Text(
-                    'History',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFEEEDFE),
+                  if (isWeb) ...[
+                    const SizedBox(width: 6),
+                    const Text(
+                      'History',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFEEEDFE),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
           ),
-          if (!isWeb) ...[
-            const SizedBox(width: 12),
-            GestureDetector(
-              onTap: () {
-                context.read<AuthBloc>().add(AuthLogoutRequested());
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                      color: Colors.white.withOpacity(0.08), width: 0.5),
-                ),
-                child: const Icon(Icons.logout_rounded,
-                    color: Color(0xFFE24B4A), size: 18),
-              ),
-            ),
-          ],
         ],
       ),
     );

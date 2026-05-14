@@ -593,7 +593,7 @@ class _StatsRow extends StatelessWidget {
         crossAxisCount: isWeb ? 5 : 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: isWeb ? 1.4 : 2.2,
+        childAspectRatio: isWeb ? 1.4 : 1.8,
       ),
       itemCount: stats.length,
       itemBuilder: (context, i) {
@@ -624,8 +624,9 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width <= 768;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(isMobile ? 12 : 16),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.04),
         borderRadius: BorderRadius.circular(16),
@@ -646,12 +647,15 @@ class _StatCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: Color(0xFF6B7089),
-                  fontWeight: FontWeight.w500,
+              Flexible(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF6B7089),
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -663,13 +667,17 @@ class _StatCard extends StatelessWidget {
                   child: CircularProgressIndicator(
                       strokeWidth: 2, color: Color(0xFF534AB7)),
                 )
-              : Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                    color: color,
-                    letterSpacing: -0.5,
+              : FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: isMobile ? 24 : 28,
+                      fontWeight: FontWeight.w700,
+                      color: color,
+                      letterSpacing: -0.5,
+                    ),
                   ),
                 ),
         ],
@@ -725,7 +733,7 @@ class _QuickActions extends StatelessWidget {
         crossAxisCount: isWeb ? 4 : 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: isWeb ? 1.6 : 1.8,
+        childAspectRatio: isWeb ? 1.6 : 1.3,
       ),
       itemCount: actions.length,
       itemBuilder: (context, i) {
@@ -733,7 +741,7 @@ class _QuickActions extends StatelessWidget {
         return GestureDetector(
           onTap: a.action,
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: a.color.withOpacity(0.08),
               borderRadius: BorderRadius.circular(16),
@@ -744,32 +752,39 @@ class _QuickActions extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  width: 36,
-                  height: 36,
+                  width: 34,
+                  height: 34,
                   decoration: BoxDecoration(
                     color: a.color.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(a.icon, color: a.color, size: 18),
+                  child: Icon(a.icon, color: a.color, size: 17),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      a.label,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFFEEEDFE),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        a.label,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFEEEDFE),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      a.subtitle,
-                      style: const TextStyle(
-                          fontSize: 11, color: Color(0xFF6B7089)),
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      Text(
+                        a.subtitle,
+                        style: const TextStyle(
+                            fontSize: 11, color: Color(0xFF6B7089)),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

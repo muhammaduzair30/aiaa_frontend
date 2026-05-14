@@ -8,7 +8,6 @@ import '../../../../core/constants/app_constants.dart';
 import '../cubit/job_application_cubit.dart';
 import '../widgets/application_card.dart';
 import '../../domain/entities/job_application_entity.dart';
-import '../../../auth/presentation/bloc/auth_bloc.dart';
 
 class ApplicationsScreen extends StatelessWidget {
   const ApplicationsScreen({super.key});
@@ -269,26 +268,6 @@ class _ApplicationsScreenViewState extends State<_ApplicationsScreenView> {
                   ]),
                 ),
               ),
-              if (!isWeb) ...[
-                const SizedBox(width: 12),
-                GestureDetector(
-                  onTap: () {
-                    context.read<AuthBloc>().add(AuthLogoutRequested());
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(12),
-                      border:
-                          Border.all(color: Colors.white.withOpacity(0.08), width: 0.5),
-                    ),
-                    child: const Icon(Icons.logout_rounded,
-                        color: Color(0xFFE24B4A), size: 18),
-                  ),
-                ),
-              ],
             ],
           ),
         ],

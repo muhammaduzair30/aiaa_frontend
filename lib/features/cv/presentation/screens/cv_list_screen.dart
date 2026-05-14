@@ -1,4 +1,3 @@
-import 'package:aiaa/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -188,26 +187,6 @@ class _CVHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              if (!isWeb) ...[
-                const SizedBox(width: 12),
-                GestureDetector(
-                  onTap: () {
-                    context.read<AuthBloc>().add(AuthLogoutRequested());
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                          color: Colors.white.withOpacity(0.08), width: 0.5),
-                    ),
-                    child: const Icon(Icons.logout_rounded,
-                        color: Color(0xFFE24B4A), size: 18),
-                  ),
-                ),
-              ],
             ],
           ),
         ],

@@ -21,12 +21,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _tabs = const [
-    _HomeTab(),
-    CVListScreen(),
-    JobsListScreen(),
-    AnalysisScreen(),
-    ApplicationsScreen(),
+  late final List<Widget> _tabs = [
+    _HomeTab(onNavigate: (i) => setState(() => _currentIndex = i)),
+    const CVListScreen(),
+    const JobsListScreen(),
+    const AnalysisScreen(),
+    const ApplicationsScreen(),
   ];
 
   // Nav items config
@@ -365,18 +365,20 @@ class _MobileNavBar extends StatelessWidget {
 // ─── Home Tab ─────────────────────────────────────────────────────────────────
 
 class _HomeTab extends StatelessWidget {
-  const _HomeTab();
+  final ValueChanged<int> onNavigate;
+  const _HomeTab({required this.onNavigate});
 
   @override
   Widget build(BuildContext context) {
-    return const _HomeTabView();
+    return _HomeTabView(onNavigate: onNavigate);
   }
 }
 
 // ─── Home Tab View ────────────────────────────────────────────────────────────
 
 class _HomeTabView extends StatefulWidget {
-  const _HomeTabView();
+  final ValueChanged<int> onNavigate;
+  const _HomeTabView({required this.onNavigate});
 
   @override
   State<_HomeTabView> createState() => _HomeTabViewState();
@@ -447,7 +449,7 @@ class _HomeTabViewState extends State<_HomeTabView> {
                 // Quick actions
                 _SectionHeader(title: 'Quick Actions'),
                 const SizedBox(height: 12),
-                _QuickActions(isWeb: isWeb),
+                _QuickActions(isWeb: isWeb, onNavigate: widget.onNavigate),
                 SizedBox(height: isWeb ? 32 : 24),
 
                 // Recent analyses
@@ -680,7 +682,8 @@ class _StatCard extends StatelessWidget {
 
 class _QuickActions extends StatelessWidget {
   final bool isWeb;
-  const _QuickActions({required this.isWeb});
+  final ValueChanged<int> onNavigate;
+  const _QuickActions({required this.isWeb, required this.onNavigate});
 
   @override
   Widget build(BuildContext context) {
@@ -690,28 +693,28 @@ class _QuickActions extends StatelessWidget {
         label: 'New CV',
         subtitle: 'Upload & optimize',
         color: const Color(0xFF534AB7),
-        route: '/cv/upload',
+        action: () => context.push('/cv/upload'),
       ),
       (
         icon: Icons.insights_rounded,
         label: 'New Analysis',
         subtitle: 'Match CV to job',
         color: const Color(0xFF1D9E75),
-        route: '/analysis',
+        action: () => onNavigate(3),
       ),
       (
         icon: Icons.work_outline_rounded,
         label: 'Browse Jobs',
         subtitle: 'Find opportunities',
         color: const Color(0xFF378ADD),
-        route: '/jobs',
+        action: () => onNavigate(2),
       ),
       (
         icon: Icons.send_outlined,
         label: 'Track Application',
         subtitle: 'Log a new apply',
         color: const Color(0xFFEF9F27),
-        route: '/applications',
+        action: () => onNavigate(4),
       ),
     ];
 
@@ -728,7 +731,7 @@ class _QuickActions extends StatelessWidget {
       itemBuilder: (context, i) {
         final a = actions[i];
         return GestureDetector(
-          onTap: () => context.push(a.route),
+          onTap: a.action,
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(

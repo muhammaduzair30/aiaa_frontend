@@ -18,6 +18,7 @@ Our goal is to provide **technical transparency** and a high-integrity architect
 ## ✨ Key Features
 
 - **📄 Robust CV Management**: Securely upload, parse, and maintain multiple versions of your resume.
+- **🌐 Automated Job Extraction**: Seamlessly import job descriptions directly via URL. Our system utilizes a robust, tiered extraction architecture to parse job details from supported platforms, minimizing manual data entry.
 - **🔍 Intelligent Job Analysis**: Compare your CV against specific job descriptions. Our system leverages advanced prompt engineering with the Gemini API to analyze semantic similarities, identify critical skill gaps, and provide an actionable match score.
 - **✍️ Automated Cover Letters**: Generate highly tailored, professional cover letters instantly, based on the specific context of your CV and the target job description.
 - **📊 Application Pipeline Tracking**: Manage your entire job hunt lifecycle across distinct stages (Saved, Applied, Interview, Offer, Rejected).

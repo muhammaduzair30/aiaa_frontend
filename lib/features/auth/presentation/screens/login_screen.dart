@@ -215,10 +215,10 @@ class _WebLayout extends StatelessWidget {
                                     label: 'Analytics'),
                               ],
                             ),
-                            ],
-                          ),
+                          ],
                         ),
-                      ));
+                      ),
+                    ));
                   },
                 ),
               ),
@@ -490,21 +490,6 @@ class _FormContent extends StatelessWidget {
                 isFocused: passwordFocused,
                 onFocusChange: onPasswordFocus,
               ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Text(
-                    'Forgot password?',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF534AB7)),
-                  ),
-                ),
-              ),
               const SizedBox(height: 16),
               if (isLoading)
                 const Center(
@@ -522,35 +507,7 @@ class _FormContent extends StatelessWidget {
                     child: Divider(
                         color: Colors.white.withOpacity(0.08), thickness: 0.5),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
-                      'or continue with',
-                      style: TextStyle(
-                          fontSize: 12, color: Colors.white.withOpacity(0.25)),
-                    ),
-                  ),
-                  Expanded(
-                    child: Divider(
-                        color: Colors.white.withOpacity(0.08), thickness: 0.5),
-                  ),
                 ],
-              ),
-              const SizedBox(height: 16),
-              OutlinedButton.icon(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                      color: Colors.white.withOpacity(0.1), width: 0.5),
-                  backgroundColor: Colors.white.withOpacity(0.04),
-                  foregroundColor: const Color(0xFFAAAABB),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                icon: const Icon(Icons.g_mobiledata, size: 22),
-                label: const Text('Sign in with Google',
-                    style: TextStyle(fontSize: 14)),
               ),
             ],
           ),

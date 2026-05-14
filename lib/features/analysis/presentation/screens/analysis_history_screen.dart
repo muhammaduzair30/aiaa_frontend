@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/di/injection.dart';
 import '../../../cv/presentation/cubit/cv_cubit.dart';
+import '../../../job/presentation/cubit/job_cubit.dart';
 import '../cubit/analysis_cubit.dart';
 
 class AnalysisHistoryScreen extends StatelessWidget {
@@ -14,6 +15,7 @@ class AnalysisHistoryScreen extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => sl<AnalysisCubit>()..loadHistory()),
         BlocProvider(create: (_) => sl<CVCubit>()..loadCVs()),
+        BlocProvider(create: (_) => sl<JobCubit>()..loadJobs()),
       ],
       child: const _AnalysisHistoryScreenView(),
     );
@@ -358,25 +360,47 @@ class _GridContent extends StatelessWidget {
         // CV name
         BlocBuilder<CVCubit, CVState>(
           builder: (context, cvState) {
-            String cvName = 'Loading...';
-            if (cvState is CVLoaded) {
-              try {
-                cvName = cvState.cvs
-                    .firstWhere((c) => c.id == analysis.cvId)
-                    .originalFilename;
-              } catch (_) {
-                cvName = 'Unknown CV';
-              }
-            }
-            return Text(
-              cvName,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFFEEEDFE),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            return BlocBuilder<JobCubit, JobState>(
+              builder: (context, jobState) {
+                String cvName = 'Loading...';
+                if (cvState is CVLoaded) {
+                  try {
+                    cvName = cvState.cvs
+                        .firstWhere((c) => c.id == analysis.cvId)
+                        .originalFilename;
+                  } catch (_) {
+                    cvName = 'Unknown CV';
+                  }
+                }
+
+                String jobContext = '';
+                if (analysis.jobId != null && jobState is JobLoaded) {
+                  try {
+                    final job =
+                        jobState.jobs.firstWhere((j) => j.id == analysis.jobId);
+                    if (job.jobTitle != null && job.jobTitle!.isNotEmpty) {
+                      jobContext = ' → ${job.jobTitle}';
+                    }
+                  } catch (_) {}
+                } else if (analysis.jdText != null &&
+                    analysis.jdText!.isNotEmpty) {
+                  final text = analysis.jdText!.replaceAll('\n', ' ').trim();
+                  final summary =
+                      text.length > 25 ? '${text.substring(0, 25)}...' : text;
+                  jobContext = ' → $summary';
+                }
+
+                return Text(
+                  '$cvName$jobContext',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFEEEDFE),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                );
+              },
             );
           },
         ),
@@ -439,24 +463,50 @@ class _ListContent extends StatelessWidget {
                   // CV name
                   BlocBuilder<CVCubit, CVState>(
                     builder: (context, cvState) {
-                      String cvName = 'Loading...';
-                      if (cvState is CVLoaded) {
-                        try {
-                          cvName = cvState.cvs
-                              .firstWhere((c) => c.id == analysis.cvId)
-                              .originalFilename;
-                        } catch (_) {
-                          cvName = 'Unknown CV';
-                        }
-                      }
-                      return Text(
-                        cvName,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFEEEDFE),
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                      return BlocBuilder<JobCubit, JobState>(
+                        builder: (context, jobState) {
+                          String cvName = 'Loading...';
+                          if (cvState is CVLoaded) {
+                            try {
+                              cvName = cvState.cvs
+                                  .firstWhere((c) => c.id == analysis.cvId)
+                                  .originalFilename;
+                            } catch (_) {
+                              cvName = 'Unknown CV';
+                            }
+                          }
+
+                          String jobContext = '';
+                          if (analysis.jobId != null && jobState is JobLoaded) {
+                            try {
+                              final job = jobState.jobs
+                                  .firstWhere((j) => j.id == analysis.jobId);
+                              if (job.jobTitle != null &&
+                                  job.jobTitle!.isNotEmpty) {
+                                jobContext = ' → ${job.jobTitle}';
+                              }
+                            } catch (_) {}
+                          } else if (analysis.jdText != null &&
+                              analysis.jdText!.isNotEmpty) {
+                            final text =
+                                analysis.jdText!.replaceAll('\n', ' ').trim();
+                            final summary = text.length > 25
+                                ? '${text.substring(0, 25)}...'
+                                : text;
+                            jobContext = ' → $summary';
+                          }
+
+                          return Text(
+                            '$cvName$jobContext',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFEEEDFE),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          );
+                        },
                       );
                     },
                   ),

@@ -90,7 +90,7 @@ class StructuredContentViewer extends StatelessWidget {
                 width: 0.5,
               ),
             ),
-            child: SelectableText(
+            child: Text(
               block.content.toString(),
               textAlign: TextAlign.center,
               style: const TextStyle(
@@ -106,7 +106,7 @@ class StructuredContentViewer extends StatelessWidget {
       case 'paragraph':
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: SelectableText.rich(
+          child: Text.rich(
             _parseInlineMarkdown(
               block.content.toString(),
               const TextStyle(
@@ -146,7 +146,7 @@ class StructuredContentViewer extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: SelectableText.rich(
+                      child: Text.rich(
                         _parseInlineMarkdown(
                           entry.value,
                           const TextStyle(
@@ -199,7 +199,7 @@ class StructuredContentViewer extends StatelessWidget {
       default:
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
-          child: SelectableText.rich(
+          child: Text.rich(
             _parseInlineMarkdown(
               block.content.toString(),
               const TextStyle(

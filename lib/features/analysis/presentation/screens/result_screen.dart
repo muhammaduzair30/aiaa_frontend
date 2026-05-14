@@ -637,24 +637,24 @@ class _ResultScreenViewState extends State<_ResultScreenView> {
             ),
           ),
           // Expanded content
-          AnimatedCrossFade(
-            firstChild: const SizedBox.shrink(),
-            secondChild: Column(
-              children: [
-                Divider(
-                    color: Colors.white.withOpacity(0.06),
-                    thickness: 0.5,
-                    height: 0),
-                Padding(
-                  padding: const EdgeInsets.all(18),
-                  child: StructuredContentViewer(contentBlocks: blocks),
-                ),
-              ],
-            ),
-            crossFadeState: isExpanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
+          AnimatedSize(
             duration: const Duration(milliseconds: 220),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: isExpanded
+                ? Column(
+                    children: [
+                      Divider(
+                          color: Colors.white.withOpacity(0.06),
+                          thickness: 0.5,
+                          height: 0),
+                      Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: StructuredContentViewer(contentBlocks: blocks),
+                      ),
+                    ],
+                  )
+                : const SizedBox(width: double.infinity),
           ),
         ],
       ),
